@@ -224,7 +224,7 @@ def compute_piqa(args):
 
 def compute_strategyqa(args):
     def read_strategyqa():
-        with open('/Users/shyammarjit/Desktop/LLM-BM/datasets/strategyqa_train.json', 'r') as file: 
+        with open(file_path, 'r') as file: 
             data = json.load(file)
         return data
 
@@ -237,13 +237,14 @@ def compute_strategyqa(args):
     data = read_strategyqa()
     if args.resume: resume = get_resume_index(args)
     else: resume = 0
-    # for i in tqdm(range(args.resume, 300)): # currently need 300 only
+    
     for i in tqdm(range(resume, len(data))):
         question, gt = data[i]['question'], data[i]['answer']
         prompt = "Can you give the answer of the following question?\n {} \nAnswer with true or false and explain your reasoning.".format(question)
         responses = []
         for t in range(0, args.num_agents):
             responses.append(chat(prompt, args.openai_key, args.model_config))
+        
         # get the most consistent answer
         prompt = f"Given the question, there are multiple possible answers. \n\nQuestion: {question}\n\nAnswers:\n"
         for ith, answer in enumerate(responses, 1):
